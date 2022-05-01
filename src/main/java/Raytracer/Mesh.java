@@ -1,5 +1,9 @@
 package Raytracer;
 
+import Raytracer.Util.HitResult;
+import Raytracer.Util.Ray3D;
+import Raytracer.Util.Triangle;
+
 import java.util.List;
 
 public class Mesh extends Object3D {

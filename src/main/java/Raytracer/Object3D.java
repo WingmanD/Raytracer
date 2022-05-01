@@ -1,5 +1,8 @@
 package Raytracer;
 
+import Raytracer.Util.HitResult;
+import Raytracer.Util.Ray3D;
+
 public abstract class Object3D {
     private String name;
 

@@ -1,13 +1,20 @@
 package Raytracer;
 
+import Raytracer.Util.HitResult;
+import Raytracer.Util.Ray3D;
+import Raytracer.Util.Vector3;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Scene {
+
+    public String name;
     public List<Object3D> objects;
     public List<Light> lights;
 
-    public Camera camera = new Camera(new Vector3(0), new Vector3(0, 0, 0), 90, 1920, 1080);
+    public Camera camera = new Camera(new Vector3(0), new Vector3(0, 0, 0), 90, 1280, 720);
+    public Vector3 backgroundColor = new Vector3(0.1);
 
     public Scene() {
         objects = new ArrayList<>();
@@ -34,5 +41,37 @@ public class Scene {
         }
 
         return null;
+    }
+
+    public List<Object3D> getObjects() {
+        return objects;
+    }
+
+    public void setObjects(List<Object3D> objects) {
+        this.objects = objects;
+    }
+
+    public List<Light> getLights() {
+        return lights;
+    }
+
+    public void setLights(List<Light> lights) {
+        this.lights = lights;
+    }
+
+    public Camera getCamera() {
+        return camera;
+    }
+
+    public void setCamera(Camera camera) {
+        this.camera = camera;
+    }
+
+    public Vector3 getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(Vector3 backgroundColor) {
+        this.backgroundColor = backgroundColor;
     }
 }

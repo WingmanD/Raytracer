@@ -1,5 +1,7 @@
 package Raytracer;
 
+import Raytracer.Util.Vector3;
+
 public class Camera {
     private Vector3 position;
     private Vector3 rotation;

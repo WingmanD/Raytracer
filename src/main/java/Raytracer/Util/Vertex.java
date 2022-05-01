@@ -1,4 +1,4 @@
-package Raytracer;
+package Raytracer.Util;
 
 public class Vertex {
     public Vector3 position;

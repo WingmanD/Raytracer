@@ -1,5 +1,7 @@
 package Raytracer;
 
+import Raytracer.Util.*;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -108,6 +110,7 @@ public class OBJLoader implements SceneLoader {
 
         Scene scene = new Scene();
         scene.objects = meshes;
+        scene.name = fileName;
 
         return scene;
     }

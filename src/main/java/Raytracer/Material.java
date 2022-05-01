@@ -1,5 +1,9 @@
 package Raytracer;
 
+import Raytracer.Util.TextureObject;
+import Raytracer.Util.Vector2;
+import Raytracer.Util.Vector3;
+
 public class Material {
     public String name;
 

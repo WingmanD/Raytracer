@@ -1,4 +1,4 @@
-package Raytracer;
+package Raytracer.Util;
 
 public class Vector3 {
     public double x;
@@ -24,6 +24,12 @@ public class Vector3 {
     }
 
     public Vector3(int i) {
+        this.x = i;
+        this.y = i;
+        this.z = i;
+    }
+
+    public Vector3(double i) {
         this.x = i;
         this.y = i;
         this.z = i;

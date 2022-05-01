@@ -1,4 +1,4 @@
-package Raytracer;
+package Raytracer.Util;
 
 public class Vector2 {
     public double x;

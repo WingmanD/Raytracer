@@ -1,4 +1,6 @@
-package Raytracer;
+package Raytracer.Util;
+
+import Raytracer.Material;
 
 public class Triangle {
     private Vertex[] vertices = new Vertex[3];

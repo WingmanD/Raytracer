@@ -1,4 +1,4 @@
-package Raytracer;
+package Raytracer.Util;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

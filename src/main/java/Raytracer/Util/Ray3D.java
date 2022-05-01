@@ -1,4 +1,4 @@
-package Raytracer;
+package Raytracer.Util;
 
 public class Ray3D {
     public Vector3 origin;
