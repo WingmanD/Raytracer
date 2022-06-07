@@ -4,7 +4,7 @@ import Raytracer.Util.Vector3;
 
 public class Camera {
     private Vector3 position;
-    private Vector3 rotation;
+    private Vector3 lookAt;
     private Vector3 forward;
     private Vector3 viewUp;
     private Vector3 right;
@@ -12,20 +12,14 @@ public class Camera {
     private int width;
     private int height;
 
-    public Camera(Vector3 position, Vector3 rotation, double fov, int width, int height) {
+    public Camera(Vector3 position, Vector3 lookAt, double fov, int width, int height) {
         this.position = position;
-        this.rotation = rotation;
+        this.lookAt = lookAt;
         this.fov = fov;
         this.width = width;
         this.height = height;
 
-        forward = new Vector3(0, 0, -1);
-        forward.rotate(rotation);
-        forward = forward.normalize();
-
-        Vector3 worldUp = new Vector3(0, 0, 1);
-        right = Vector3.cross(forward, worldUp);
-        viewUp = Vector3.cross(right, forward);
+        calculateForwardVector();
     }
 
     public Vector3 getPosition() {
@@ -46,14 +40,24 @@ public class Camera {
 
     public void setPosition(Vector3 position) {
         this.position = position;
+        calculateForwardVector();
     }
 
-    public Vector3 getRotation() {
-        return rotation;
+    public Vector3 getLookAt() {
+        return lookAt;
     }
 
-    public void setRotation(Vector3 rotation) {
-        this.rotation = rotation;
+    public void setLookAt(Vector3 lookAt) {
+        this.lookAt = lookAt;
+        calculateForwardVector();
+    }
+
+    private void calculateForwardVector() {
+        this.forward = lookAt.sub(position).normalize();
+
+        Vector3 worldUp = new Vector3(0, 0, 1);
+        right = Vector3.cross(forward, worldUp).normalize();
+        viewUp = Vector3.cross(right, forward).normalize();
     }
 
     public void setFov(double fov) {

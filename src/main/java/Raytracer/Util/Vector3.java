@@ -43,6 +43,9 @@ public class Vector3 {
         return new Vector3(this.y * v.z - this.z * v.y, this.z * v.x - this.x * v.z, this.x * v.y - this.y * v.x);
     }
 
+    public static double dot(Vector3 v1, Vector3 v2) {
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+    }
     public static Vector3 cross(Vector3 v1, Vector3 v2) {
         return v1.cross(v2);
     }
@@ -114,6 +117,10 @@ public class Vector3 {
 
     public double length() {
         return Math.sqrt(x * x + y * y + z * z);
+    }
+
+    public double distance(Vector3 v) {
+        return Math.sqrt(Math.pow(v.x - x, 2) + Math.pow(v.y - y, 2) + Math.pow(v.z - z, 2));
     }
 
     public String toString() {

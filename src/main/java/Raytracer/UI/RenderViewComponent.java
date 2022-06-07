@@ -13,6 +13,7 @@ public class RenderViewComponent extends JComponent {
 
     public RenderViewComponent(Renderer renderer) {
         this.renderer = renderer;
+        renderer.addListener(this);
 
         setPreferredSize(new Dimension(renderer.getRender().getWidth(), renderer.getRender().getHeight()));
     }
@@ -21,5 +22,9 @@ public class RenderViewComponent extends JComponent {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(renderer.getRender(), 0, 0, null);
+    }
+
+    public void update() {
+        repaint();
     }
 }

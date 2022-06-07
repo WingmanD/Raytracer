@@ -2,6 +2,7 @@ package Raytracer;
 
 import Raytracer.Util.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,7 +38,9 @@ public class OBJLoader implements SceneLoader {
                 String[] tokens = line.split(" ");
 
                 switch (tokens[0]) {
-                    case "mtllib" -> materials = loadMaterials(tokens[1]);
+                    case "mtllib" -> {
+                        materials = loadMaterials(getMaterialFilePath(fileName, tokens[1]));
+                    }
                     case "o" -> {
                         meshIndex++;
 
@@ -45,11 +48,7 @@ public class OBJLoader implements SceneLoader {
                             name = tokens[1];
                         } else {
                             meshes.add(new Mesh(name, faces));
-                            vertices.clear();
-                            UVs.clear();
-                            normals.clear();
-                            faces.clear();
-
+                            faces = new ArrayList<>();
                             name = tokens[1];
                         }
 
@@ -71,25 +70,48 @@ public class OBJLoader implements SceneLoader {
                             Float.parseFloat(tokens[3])
                     ));
                     case "f" -> {
-                        String[] vertexTokens = tokens[1].split("/");
-                        String[] uvTokens = tokens[2].split("/");
-                        String[] normalTokens = tokens[3].split("/");
+                        String[] v1tokens = tokens[1].split("/");
+                        String[] v2tokens = tokens[2].split("/");
+                        String[] v3tokens = tokens[3].split("/");
 
-                        Vertex v1 = vertices.get(Integer.parseInt(vertexTokens[0]) - 1);
-                        Vertex v2 = vertices.get(Integer.parseInt(vertexTokens[1]) - 1);
-                        Vertex v3 = vertices.get(Integer.parseInt(vertexTokens[2]) - 1);
+                        Vertex v1 = vertices.get(Integer.parseInt(v1tokens[0]) - 1);
+                        Vertex v2 = vertices.get(Integer.parseInt(v2tokens[0]) - 1);
+                        Vertex v3 = vertices.get(Integer.parseInt(v3tokens[0]) - 1);
 
-                        Vector2 uv1 = UVs.get(Integer.parseInt(uvTokens[0]) - 1);
-                        Vector2 uv2 = UVs.get(Integer.parseInt(uvTokens[1]) - 1);
-                        Vector2 uv3 = UVs.get(Integer.parseInt(uvTokens[2]) - 1);
 
-                        Vector3 normal1 = normals.get(Integer.parseInt(normalTokens[0]) - 1);
-                        Vector3 normal2 = normals.get(Integer.parseInt(normalTokens[1]) - 1);
-                        Vector3 normal3 = normals.get(Integer.parseInt(normalTokens[2]) - 1);
+                        try {
+                            int uv1Index = Integer.parseInt(v1tokens[1]) - 1;
+                            if (uv1Index < UVs.size())
+                                v1.uv = UVs.get(uv1Index);
+                            else
+                                v1.uv = new Vector2(0, 0);
+                        } catch (NumberFormatException e) {
+                            v1.uv = new Vector2(0, 0);
+                        }
 
-                        v1.uv = uv1;
-                        v2.uv = uv2;
-                        v3.uv = uv3;
+                        try {
+                            int uv2Index = Integer.parseInt(v2tokens[1]) - 1;
+                            if (uv2Index < UVs.size())
+                                v2.uv = UVs.get(uv2Index);
+                            else
+                                v2.uv = new Vector2(0, 0);
+                        } catch (NumberFormatException e) {
+                            v2.uv = new Vector2(0, 0);
+                        }
+
+                        try {
+                            int uv3Index = Integer.parseInt(v3tokens[1]) - 1;
+                            if (uv3Index < UVs.size())
+                                v3.uv = UVs.get(uv3Index);
+                            else
+                                v3.uv = new Vector2(0, 0);
+                        } catch (NumberFormatException e) {
+                            v3.uv = new Vector2(0, 0);
+                        }
+
+                        Vector3 normal1 = normals.get(Integer.parseInt(v1tokens[2]) - 1);
+                        Vector3 normal2 = normals.get(Integer.parseInt(v2tokens[2]) - 1);
+                        Vector3 normal3 = normals.get(Integer.parseInt(v3tokens[2]) - 1);
 
                         v1.normal = normal1;
                         v2.normal = normal2;
@@ -107,6 +129,7 @@ public class OBJLoader implements SceneLoader {
 
             }
         }
+        meshes.add(new Mesh(name, faces));
 
         Scene scene = new Scene();
         scene.objects = meshes;
@@ -145,13 +168,18 @@ public class OBJLoader implements SceneLoader {
                     case "Ns" -> currentMaterial.setSpecularExponent(Float.parseFloat(tokens[1]));
                     case "Ni" -> currentMaterial.setIOR(Float.parseFloat(tokens[1]));
                     case "d" -> currentMaterial.setOpacity(Float.parseFloat(tokens[1]));
-                    case "map_Kd" -> currentMaterial.setDiffuseMap(new TextureObject(tokens[1]));
-                    case "map_Ks" -> currentMaterial.setSpecularMap(new TextureObject(tokens[1]));
-                    case "map_Ka" -> currentMaterial.setAmbientMap(new TextureObject(tokens[1]));
-                    case "map_Ke" -> currentMaterial.setEmissiveMap(new TextureObject(tokens[1]));
+                    case "map_Kd" ->
+                            currentMaterial.setDiffuseMap(new TextureObject(getTextureFilePath(fileName, tokens[2])));
+                    case "map_Ks" ->
+                            currentMaterial.setSpecularMap(new TextureObject(getTextureFilePath(fileName, tokens[2])));
+                    case "map_Ka" ->
+                            currentMaterial.setAmbientMap(new TextureObject(getTextureFilePath(fileName, tokens[2])));
+                    case "map_Ke" ->
+                            currentMaterial.setEmissiveMap(new TextureObject(getTextureFilePath(fileName, tokens[2])));
                     case "map_Ns" ->
-                            currentMaterial.setSpecularExponentMap(new TextureObject(tokens[1]));
-                    case "map_d" -> currentMaterial.setOpacityMap(new TextureObject(tokens[1]));
+                            currentMaterial.setSpecularExponentMap(new TextureObject(getTextureFilePath(fileName, tokens[2])));
+                    case "map_d" ->
+                            currentMaterial.setOpacityMap(new TextureObject(getTextureFilePath(fileName, tokens[2])));
                 }
             }
         } catch (NullPointerException e) {
@@ -159,5 +187,13 @@ public class OBJLoader implements SceneLoader {
         }
 
         return materials;
+    }
+
+    private String getMaterialFilePath(String mainFileName, String otherfileName) {
+        return Path.of(new File(mainFileName).getParent(), otherfileName).toString();
+    }
+
+    private String getTextureFilePath(String mainFileName, String otherfileName) {
+        return Path.of(new File(mainFileName).getParent(), new File(otherfileName).getName()).toString();
     }
 }

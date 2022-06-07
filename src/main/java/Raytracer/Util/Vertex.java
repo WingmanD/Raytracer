@@ -15,4 +15,9 @@ public class Vertex {
         this.uv = uv;
         this.normal = normal;
     }
+
+    @Override
+    public String toString() {
+        return position.toString();
+    }
 }

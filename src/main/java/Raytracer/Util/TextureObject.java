@@ -12,6 +12,7 @@ public class TextureObject {
     public TextureObject(String path) {
         this.name = path;
 
+        System.out.println("Loading texture: " + path);
         try {
             image = ImageIO.read(new File(path));
         } catch (IOException e) {

@@ -35,12 +35,29 @@ public class Scene {
     }
 
     public HitResult LineTraceSingle(Ray3D ray) {
+        double distance = Double.MAX_VALUE;
+        HitResult result = null;
         for (Object3D object : objects) {
             HitResult hitResult = object.RayIntersection(ray);
-            if (hitResult != null) return hitResult;
+            if (hitResult != null && ray.origin.distance(hitResult.intersection()) < distance) {
+                distance = ray.origin.distance(hitResult.intersection());
+                result = hitResult;
+            }
         }
 
-        return null;
+        return result;
+    }
+
+    public List<HitResult> LineTraceMulti(Ray3D ray) {
+        List<HitResult> results = new ArrayList<>();
+        for (Object3D object : objects) {
+            HitResult hitResult = object.RayIntersection(ray);
+            if (hitResult != null) {
+                results.add(hitResult);
+            }
+        }
+
+        return results;
     }
 
     public List<Object3D> getObjects() {

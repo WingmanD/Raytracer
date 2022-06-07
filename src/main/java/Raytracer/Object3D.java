@@ -12,4 +12,8 @@ public abstract class Object3D {
 
     public abstract HitResult RayIntersection(Ray3D ray);
 
+    public String getName() {
+        return name;
+    }
+
 }
