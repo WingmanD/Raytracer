@@ -80,24 +80,6 @@ public class Renderer {
         }
 
         System.out.println("Rendering done");
-
-        Ray3D ray = new Ray3D(scene.camera.getPosition(), scene.camera.getForward(), 1000);
-        HitResult hit = scene.LineTraceSingle(ray);
-        if (hit != null) {
-            System.out.println("Hit: " + hit.intersection() + " " + hit.normal());
-            Vector3 L = scene.lights.get(0).getPosition().sub(hit.intersection());
-
-            Ray3D shadowRay = new Ray3D(hit.intersection().add(L.mul(0.1)), L, 1000);
-            HitResult shadowHit = scene.LineTraceSingle(shadowRay);
-            if (shadowHit != null) {
-                System.out.println("Shadow hit: " + shadowHit.intersection() + " " + shadowHit.normal());
-            } else {
-                System.out.println("No shadow hit");
-            }
-
-        } else {
-            System.out.println("No hit");
-        }
     }
 
     private Vector3 TraceRay(Ray3D ray, double contribution, double IOR) {
@@ -106,26 +88,28 @@ public class Renderer {
         if (hitResult == null)
             return scene.backgroundColor;
 
-        // System.out.println("hit: " + hitResult.intersection());
-
         Vector3 color = new Vector3(0, 0, 0);
-        //Vector3 color = hitResult.material().getColor(hitResult.uv());
 
         for (Light light : scene.lights) {
             Vector3 L = light.getPosition().sub(hitResult.intersection());
 
             Ray3D shadowRay = new Ray3D(hitResult.intersection().add(L.mul(0.1)), L, 1000);
-            HitResult shadowIntersection = scene.LineTraceSingle(shadowRay);
-            //todo implement translucent objects here, line trace multi
-            if (shadowIntersection == null || shadowIntersection.intersection().distance(hitResult.intersection()) > L.length()) {
-                Vector3 lightColor = light.getColor().mul(light.getIntensity());
-                Vector3 diffuse = lightColor.mul(hitResult.material().getColor(hitResult.uv())).mul(Math.max(0, L.dot(hitResult.normal())));
-                color = color.add(diffuse);
 
-                Vector3 R = hitResult.normal().mul(2 * L.dot(hitResult.normal())).sub(L);
-                Vector3 specular = lightColor.mul(hitResult.material().getSpecular()).mul(Math.max(0, Math.pow(R.dot(ray.direction.mul(-1)), hitResult.material().getSpecularExponent())));
-                //color = color.add(specular);
+            var hits = scene.LineTraceMulti(shadowRay);
+            double lightAmount = 1;
+            for (HitResult hit : hits) {
+                if (hit.intersection().distance(shadowRay.origin) < L.length()) {
+                    lightAmount *= 1 - hit.material().getOpacity();
+                }
             }
+
+            Vector3 lightColor = light.getColor().mul(light.getIntensity());
+            Vector3 diffuse = lightColor.mul(hitResult.material().getColor(hitResult.uv())).mul(Math.max(0, L.dot(hitResult.normal())));
+            color = color.add(diffuse.mul(lightAmount * hitResult.material().getOpacity()));
+
+            Vector3 R = hitResult.normal().mul(2 * L.dot(hitResult.normal())).sub(L);
+            Vector3 specular = lightColor.mul(hitResult.material().getSpecular()).mul(Math.max(0, Math.pow(R.dot(ray.direction.mul(-1)), hitResult.material().getSpecularExponent())));
+            // color = color.add(specular.mul(lightAmount*hitResult.material().getOpacity()));
         }
 
         contribution *= hitResult.material().getSpecularExponent() / 1000 * 0.25;
@@ -147,7 +131,7 @@ public class Renderer {
 
                 Ray3D refractionRay = new Ray3D(hitResult.intersection(), R, 1000);
                 Vector3 refractionColor = TraceRay(refractionRay, contribution * hitResult.material().getOpacity(), hitResult.material().getIOR()).mul(1 - hitResult.material().getOpacity());
-                color = color.add(refractionColor);
+                color = color.add(refractionColor.mul(hitResult.material().getOpacity()));
             }
         }
 
