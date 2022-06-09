@@ -45,33 +45,21 @@ public class Triangle {
 
     public HitResult intersect(Ray3D ray) {
         double Vd = Vector3.dot(ray.direction, normal);
-        if (Vd == 0) {
-            //System.out.println("line is parallel to triangle");
-            return null;
-        }
+        if (Vd == 0) return null;
 
         double t = -(normal.dot(ray.origin) + D) / Vd;
-        if (t < 0 || t > ray.length) {
-            // System.out.println("intersection is behind ray origin or too far, t = " + t);
-            return null;
-        }
+        if (t < 0 || t > ray.length) return null;
 
         Vector3 intersection = ray.getPoint(t);
-
         Vector3 eP = intersection.sub(vertices[0].position);
 
         double t1 = Vector3.cross(e0, eP).length() * 0.5 / area;
         double t2 = Vector3.cross(e1, intersection.sub(vertices[1].position)).length() * 0.5 / area;
         double t3 = Vector3.cross(eP, e2).length() * 0.5 / area;
 
-
-        if (t1 < 0 || t1 > 1 || t2 < 0 || t2 > 1 || t3 < 0 || t3 > 1 || t1 + t2 + t3 < 0.99 || t1 + t2 + t3 > 1.01) {
-            //System.out.println("intersection is outside of triangle " + Arrays.toString(this.vertices) + " normal " + this.normal + ", u = " + t1 + ", v = " + t2 + ", w = " + t3 + ", intersection: " + intersection);
+        if (t1 < 0 || t1 > 1 || t2 < 0 || t2 > 1 || t3 < 0 || t3 > 1 || t1 + t2 + t3 < 0.99 || t1 + t2 + t3 > 1.01)
             return null;
-        }
 
-        //System.out.println("hit triangle: " + this.toString());
-        //System.out.println("u = " + t1 + ", v = " + t2 + ", w = " + t3);
         return new HitResult(intersection, normal, material, new Vector2(t1, t2));
     }
 
