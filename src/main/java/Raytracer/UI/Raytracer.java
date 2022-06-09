@@ -23,7 +23,6 @@ public class Raytracer extends JFrame {
     private static final long serialVersionUID = 1L;
     private Renderer renderer;
     private JLabel sceneLabel;
-    //private JTextField samplesField;
     private JPanel detailsPanel;
     private GridBagConstraints gbc = new GridBagConstraints();
 
@@ -78,15 +77,6 @@ public class Raytracer extends JFrame {
 
         detailsPanel.add(scenePanel, gbc);
 
-        /*JPanel samplesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel samplesLabel = new JLabel("Samples: ", JLabel.LEFT);
-        samplesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        //todo
-        samplesField = new JTextField("1", 5);
-        samplesPanel.add(samplesLabel);
-        samplesPanel.add(samplesField);*/
-
         renderButton = new JButton(render);
         renderButton.setEnabled(false);
         saveButton = new JButton(save);
@@ -113,12 +103,11 @@ public class Raytracer extends JFrame {
             fileChooser.setFileFilter(new FileFilter() {
                 @Override
                 public boolean accept(File f) {
-                    return true;
-                    /*try {
-                        return f.getCanonicalPath().endsWith(".obj");
+                    try {
+                        return f.exists() && (f.getCanonicalPath().endsWith(".obj") || f.isDirectory());
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
-                    }*/
+                    }
                 }
 
                 @Override
@@ -191,7 +180,27 @@ public class Raytracer extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Save");
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileFilter(new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    try {
+                        return f.getCanonicalPath().endsWith(".png") || f.isDirectory();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+
+                @Override
+                public String getDescription() {
+                    return "PNG files";
+                }
+            });
+
+            if (fileChooser.showOpenDialog(Raytracer.this) == JFileChooser.APPROVE_OPTION) {
+                System.out.println("Saving " + fileChooser.getSelectedFile().getAbsolutePath());
+                renderer.saveRender(fileChooser.getSelectedFile().getAbsolutePath());
+            }
         }
     };
 

@@ -16,7 +16,6 @@ public class TextureObject {
         try {
             image = ImageIO.read(new File(path));
         } catch (IOException e) {
-            //TODO: handle exception
             throw new RuntimeException(e);
         }
     }

@@ -43,10 +43,6 @@ public class Renderer {
 
         final Vector3 topLeftPixelFinal = topLeftPixel;
 
-        for (Object3D object : scene.objects) {
-            System.out.println("object: " + object.getName() + " triangles: " + ((Mesh) object).triangles.size());
-        }
-
         int threadCount = Runtime.getRuntime().availableProcessors();
         Thread[] threads = new Thread[threadCount];
         for (int i = 0; i < threadCount; i++) {
@@ -59,7 +55,7 @@ public class Renderer {
 
                         Ray3D ray = new Ray3D(scene.camera.getPosition(), pixel.sub(scene.camera.getPosition()), 1000);
 
-                        Vector3 color = TraceRay(ray, 1, IOR_AIR);//.add(scene.backgroundColor);
+                        Vector3 color = TraceRay(ray, 1, IOR_AIR);
                         render.setRGB(x, y, Util.Vector3ToColor(color).getRGB());
 
                         notifyListeners();
@@ -78,8 +74,6 @@ public class Renderer {
                 }
             }
         }
-
-        System.out.println("Rendering done");
     }
 
     private Vector3 TraceRay(Ray3D ray, double contribution, double IOR) {
@@ -106,10 +100,6 @@ public class Renderer {
             Vector3 lightColor = light.getColor().mul(light.getIntensity());
             Vector3 diffuse = lightColor.mul(hitResult.material().getColor(hitResult.uv())).mul(Math.max(0, L.dot(hitResult.normal())));
             color = color.add(diffuse.mul(lightAmount * hitResult.material().getOpacity()));
-
-            Vector3 R = hitResult.normal().mul(2 * L.dot(hitResult.normal())).sub(L);
-            Vector3 specular = lightColor.mul(hitResult.material().getSpecular()).mul(Math.max(0, Math.pow(R.dot(ray.direction.mul(-1)), hitResult.material().getSpecularExponent())));
-            // color = color.add(specular.mul(lightAmount*hitResult.material().getOpacity()));
         }
 
         contribution *= hitResult.material().getSpecularExponent() / 1000 * 0.25;
